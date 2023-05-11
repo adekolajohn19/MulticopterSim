@@ -6,6 +6,7 @@ Copyright (C) 2019 Simon D. Levy
 MIT License
 '''
 
+from time import time
 
 class LaunchController(object):
 
@@ -14,6 +15,7 @@ class LaunchController(object):
         # Constants
         self.Kp = Kp
         self.windupMax = windupMax
+        self.startTime = time()
 
     def getDemands(self, target, alt, vel):
 
@@ -25,7 +27,8 @@ class LaunchController(object):
 
         # Don't mess with roll,pitch, and yaw for this simple demo
         roll = 0
-        pitch = 0
+        #pitch =0
+        pitch = -.01 if time() - self.startTime < 10 else 0
         yaw = 0
 
         return throttle, roll, pitch, yaw
