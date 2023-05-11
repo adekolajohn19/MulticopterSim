@@ -99,7 +99,7 @@ class LaunchCopter(MulticopterServer):
             
             for pic, contour in enumerate(biggest_blobs):
                 area = cv2.contourArea(contour)
-                print(area)
+                #print(area)
 
                 x, y, w, h = cv2.boundingRect(contour)
                 image = cv2.rectangle(image, (x, y),

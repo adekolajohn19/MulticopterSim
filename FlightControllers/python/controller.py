@@ -23,12 +23,15 @@ class LaunchController(object):
         velError = (target - alt) - vel
 
         # Always compute throttle demand for altitude hold
-        throttle = self.Kp * velError
-
+        throttle =self.Kp * velError if time() - self.startTime < 8 else 0
         # Don't mess with roll,pitch, and yaw for this simple demo
         roll = 0
         #pitch =0
-        pitch = -.01 if time() - self.startTime < 10 else 0
+        if time() - self.startTime < 5:
+            pitch = -.01 
+        elif 8 > time() - self.startTime > 5.01 :
+            pitch = .006 
+        else:
+            pitch = 0
         yaw = 0
-
         return throttle, roll, pitch, yaw
