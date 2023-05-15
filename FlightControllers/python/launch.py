@@ -11,7 +11,7 @@ try:
     import cv2
 except Exception:
     pass
-
+from time import time
 import numpy as np
 import argparse
 from argparse import ArgumentDefaultsHelpFormatter
@@ -34,10 +34,10 @@ class LaunchCopter(MulticopterServer):
         MulticopterServer.__init__(self)
 
         self.mixer = mixer
-
+        self.done=False
         self.time = 0
         self.target = initial_target
-
+    
         # Create PID controller
         self.ctrl = LaunchController(kp, ki)
 
@@ -102,12 +102,15 @@ class LaunchCopter(MulticopterServer):
                 #print(area)
 
                 x, y, w, h = cv2.boundingRect(contour)
+                #print("x-coordinate: ", x+w)
+                #print("y-coordinate: ", y+h)
+               
                 image = cv2.rectangle(image, (x, y),
                                             (x + w, y + h),
-                                            (255, 0, 0), 2)	
-                cv2.putText(image, "Blue", (x, y),
+                                            (0, 0, 255), 2)	
+                cv2.putText(image, "Red", (x, y),
                                 cv2.FONT_HERSHEY_SIMPLEX,
-                                1.0, (255, 0, 0))
+                                1.0, (0, 0, 255))
             
                     
             # Program Termination
@@ -134,6 +137,9 @@ class LaunchCopter(MulticopterServer):
 
         # Get demands U [throttle, roll, pitch, yaw] from PID controller,
         # ignoring stick demands
+        if self.done==False:
+            self.done=True
+            self.ctrl.startTime= time()
         u = self.ctrl.getDemands(self.target, z, dzdt)
 
         # Use mixer to convert demands U into motor values Omega
