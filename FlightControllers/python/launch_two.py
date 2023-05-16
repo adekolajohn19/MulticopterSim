@@ -20,7 +20,7 @@ from controller import LaunchController
 from multicopter_server import MulticopterServer
 from mixers import PhantomMixer, IngenuityMixer
 from debugging import debug
-
+from t_controller import TunnelController
 
 class LaunchCopter(MulticopterServer):
 
@@ -32,15 +32,15 @@ class LaunchCopter(MulticopterServer):
             initial_target=5.0):
 
         MulticopterServer.__init__(self)
-
+        self.direction=""
         self.mixer = mixer
-        self.done=False
         self.time = 0
         self.target = initial_target
         cv2.setUseOptimized(onoff=True)
+        self.launch= LaunchController(kp,ki)
         # Create PID controller
-        self.ctrl = LaunchController(kp, ki)
-
+        self.ctrl = TunnelController(kp, ki)
+        self.origin=""
     def handleImage(self, image):
         try:
             
@@ -62,7 +62,7 @@ class LaunchCopter(MulticopterServer):
             M = cv2.moments(c)
             center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
             #print(center)
-            print(x)    
+            #print(x)    
           
             cv2.circle(image, (int(x), int(y)), int(radius),
                             (0, 255, 255), 2)
@@ -70,22 +70,18 @@ class LaunchCopter(MulticopterServer):
            
             #EDIT:
             if x > 290 and  x < 310:
-                print("middle")
+                self.direction="middle"
 
             elif x > 1 and  x < 290:
-                print("left")
+                self.direction="left"
             
             elif x > 310 and x < 600:
-                print("right")
+                self.direction="right"
                 
-
-           
 
             # show the frame to our screen
             cv2.imshow("Image", image)
-            key = cv2.waitKey(1) & 0xFF
-
-           
+            key = cv2.waitKey(1) & 0xFF     
 
         except Exception:
             debug('Failed')
@@ -103,11 +99,40 @@ class LaunchCopter(MulticopterServer):
 
         # Get demands U [throttle, roll, pitch, yaw] from PID controller,
         # ignoring stick demands
-        if self.done==False:
-            self.done=True
-            self.ctrl.startTime= time()
-        u = self.ctrl.getDemands(self.target, z, dzdt)
+        #if self.done==False:
+         #   self.done=True
+          #  self.ctrl.startTime= time()
+        if self.direction== "middle":
 
+            
+            if self.origin == "l":
+                print(1)
+                exit(0)
+                u = self.ctrl.getLeftDemands(self.target,z,dzdt)
+            elif self.origin== "r":
+                print(1)
+                exit(0)
+                u = self.ctrl.getRightDemands(self.target.z.dzdt)
+            #print(1)
+            #exit(0)
+            if self.ctrl.done==False:
+                self.ctrl.done=True
+                self.ctrl.startTime= time()
+            u = self.ctrl.getDemands(self.target, z, dzdt)
+        elif self.direction=="left":
+            print(1)
+            self.origin = "l"
+            #print(2)
+            if self.launch.done==False:
+                self.launch.done=True
+                self.launch.startTime= time()
+            u= self.launch.getLeftDemands(self.target,z,dzdt)
+        else: #self.direction=="right":
+            self.origin = "r"
+            if self.launch.done==False:
+                self.launch.done=True
+                self.launch.startTime= time()
+            u= self.launch.getRightDemands(self.target,z,dzdt)
         # Use mixer to convert demands U into motor values Omega
         omega = self.mixer.getMotors(u)
 
