@@ -33,6 +33,8 @@ class LaunchController(object):
         pitch = 0
         yaw = 0.01
 
+
+
         return throttle, roll, pitch, yaw
     
     def getRightDemands(self, target, alt, vel):
@@ -46,6 +48,6 @@ class LaunchController(object):
         # Don't mess with roll,pitch, and yaw for this simple demo
         roll = 0
         pitch = 0
-        yaw = 0.01
+        yaw = -0.01
 
         return throttle, roll, pitch, yaw    
