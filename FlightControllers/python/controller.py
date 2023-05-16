@@ -29,7 +29,7 @@ class LaunchController(object):
         roll = 0
         #pitch =0
         
-        print(self.startTime)
+        
         if time() - self.startTime < 2.4:
             pitch = -.01 
         elif 6 > time() - self.startTime > 2.41 :
@@ -37,7 +37,7 @@ class LaunchController(object):
         else:
             pitch = 0
         yaw = 0
-        print(time() - self.startTime)
+        
     
         return throttle, roll, pitch, yaw
         

@@ -37,7 +37,7 @@ class LaunchCopter(MulticopterServer):
         self.done=False
         self.time = 0
         self.target = initial_target
-    
+        cv2.setUseOptimized(onoff=True)
         # Create PID controller
         self.ctrl = LaunchController(kp, ki)
 
@@ -93,17 +93,26 @@ class LaunchCopter(MulticopterServer):
             contours = sorted(contours, key=cv2.contourArea, reverse=True)
             # Get the biggest 3 blobs
             biggest_blobs = contours[:3]
-            
-         
 
+
+
+            
             
             for pic, contour in enumerate(biggest_blobs):
                 area = cv2.contourArea(contour)
                 #print(area)
-
+                
+                # Calculate the distance between the camera and the object.
+                #distance = cv2.pointPolygonTest(contour[0], (0, 0), True)
+                #print(distance)
+                # Calculate the angle between the camera and the object.
+                #angle = cv2.angle(contour[0][0], contour[0][1], (0, 0))
+                #print(angle)
+                # Display the position of the camera in relation to the object.
+               #cv2.putText(image, "Camera Position: (%d, %d)" % (distance, angle), (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255))
                 x, y, w, h = cv2.boundingRect(contour)
-                #print("x-coordinate: ", x+w)
-                #print("y-coordinate: ", y+h)
+                print("x-coordinate: ", x+w)
+                print("y-coordinate: ", y+h)
                
                 image = cv2.rectangle(image, (x, y),
                                             (x + w, y + h),
