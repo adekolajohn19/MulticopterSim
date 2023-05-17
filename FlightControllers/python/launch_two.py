@@ -63,8 +63,7 @@ class LaunchCopter(MulticopterServer):
             ((x, y), radius) = cv2.minEnclosingCircle(c)
             M = cv2.moments(c)
             center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
-            #print(center)
-            #print(x)    
+           
           
             cv2.circle(image, (int(x), int(y)), int(radius),
                             (0, 255, 255), 2)
@@ -102,12 +101,7 @@ class LaunchCopter(MulticopterServer):
         z = -state[MulticopterServer.STATE_Z]
         dzdt = -state[MulticopterServer.STATE_DZ]
 
-        # Get demands U [throttle, roll, pitch, yaw] from PID controller,
-        # ignoring stick demands
-        #if self.done==False:
-         #   self.done=True
-          #  self.ctrl.startTime= time()
-        if self.launch.okay:
+        if self.launch.okay or self.ap= "middle":
             if self.ctrl.done==False:
                     self.ctrl.done=True
                     self.ctrl.startTime= time()
@@ -153,7 +147,6 @@ def main():
     if args.vehicle in d:
         copter = LaunchCopter(d[args.vehicle]())
         copter.start()
-
     else:
         debug('Unrecognized vehicle: %s' % args.vehicle)
 

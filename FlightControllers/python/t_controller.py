@@ -17,41 +17,9 @@ class TunnelController(object):
         self.windupMax = windupMax
         self.done= False
         self.startTime = float(0)
-    def fromLeftDemands(self, target, alt, vel):
-        # Compute dzdt setpoint and error
-        velError = (0 - alt) - vel
-
-        # Always compute throttle demand for altitude hold
-        throttle =self.Kp * velError if time() - self.startTime < 3 else 0
-
-        # Don't mess with roll,pitch, and yaw for this simple demo
-        roll = 0
-        pitch = 0
-
-        if time() - self.startTime < .3:
-            yaw = -5
-        else:
-            yaw = 0
-            exit(0)
-            throttle, roll, pitch, yaw = self.getDemands(target, alt, vel)
         
 
-        return throttle, roll, pitch, yaw    
-    
-    def fromRightDemands(self, target, alt, vel):
-        # Compute dzdt setpoint and error
-        velError = (target - alt) - vel
-
-        # Always compute throttle demand for altitude hold
-        throttle = self.Kp * velError
-
-        # Don't mess with roll,pitch, and yaw for this simple demo
-        roll = 0
-        pitch = 0
-        yaw = 0.001
-
     def getDemands(self, target, alt, vel):
-
         # Compute dzdt setpoint and error
         velError = (target - alt) - vel
 
