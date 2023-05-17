@@ -17,8 +17,8 @@ class LaunchController(object):
         self.windupMax = windupMax
         # if  true it is right, false is left
         self.done= False
-        self.startTime = 0
-    
+        self.startTime = float(0)
+        self.okay=False
 
     def getLeftDemands(self, target, alt, vel):
 
@@ -26,16 +26,21 @@ class LaunchController(object):
         velError = (target - alt) - vel
 
         # Always compute throttle demand for altitude hold
-        throttle = self.Kp * velError
+        if time() - self.startTime>23:
+            self.okay= True
+        throttle = self.Kp * velError if time() - self.startTime < 21.95 else 0
 
         # Don't mess with roll,pitch, and yaw for this simple demo
         roll = 0
         pitch = 0
-        yaw = 0.01
-
-
-
-        return throttle, roll, pitch, yaw
+        yaw= -0.0001
+        print(int(time()-self.startTime))
+        if time() - self.startTime < 10:
+            yaw = 0.0001
+        elif time() - self.startTime > 12:
+            pitch= -.0001
+            yaw= 0
+        return throttle, roll, pitch, yaw    
     
     def getRightDemands(self, target, alt, vel):
 
@@ -43,11 +48,18 @@ class LaunchController(object):
         velError = (target - alt) - vel
 
         # Always compute throttle demand for altitude hold
-        throttle = self.Kp * velError
+        if time() - self.startTime>23:
+            self.okay= True
+        throttle = self.Kp * velError if time() - self.startTime < 21.95 else 0
 
         # Don't mess with roll,pitch, and yaw for this simple demo
         roll = 0
         pitch = 0
-        yaw = -0.01
-
+        yaw= 0.0001
+        print(int(time()-self.startTime))
+        if time() - self.startTime < 10:
+            yaw = -0.0001
+        elif time() - self.startTime > 12:
+            pitch= .0001
+            yaw= 0
         return throttle, roll, pitch, yaw    

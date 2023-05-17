@@ -32,14 +32,16 @@ class LaunchCopter(MulticopterServer):
             initial_target=5.0):
 
         MulticopterServer.__init__(self)
+        self.ap=""
+        self.count=0
         self.direction=""
         self.mixer = mixer
         self.time = 0
         self.target = initial_target
         cv2.setUseOptimized(onoff=True)
-        self.launch= LaunchController(kp,ki)
+        self.launch= LaunchController(kp,int(ki))
         # Create PID tunnel controller
-        self.ctrl = TunnelController(kp, ki)
+        self.ctrl = TunnelController(kp, int(ki))
         self.origin=""
     def handleImage(self, image):
         try:
@@ -67,17 +69,20 @@ class LaunchCopter(MulticopterServer):
             cv2.circle(image, (int(x), int(y)), int(radius),
                             (0, 255, 255), 2)
             cv2.circle(image, center, 5, (0, 0, 255), -1)
-           
+            
             #EDIT:
-            if x > 250 and  x < 380:
+            if x > 299 and  x < 301:
                 self.direction="middle"
 
-            elif x > 1 and  x < 250:
+            elif x > 1 and  x < 299:
                 self.direction="left"
             
-            elif x > 380 and x < 600:
+            elif x > 301 and x < 600:
                 self.direction="right"
-                
+
+            if self.count==0:
+                self.ap=self.direction 
+                self.count+=1  
 
             # show the frame to our screen
             cv2.imshow("Image", image)
@@ -102,38 +107,26 @@ class LaunchCopter(MulticopterServer):
         #if self.done==False:
          #   self.done=True
           #  self.ctrl.startTime= time()
-        if self.direction== "middle":
+        if self.launch.okay:
             if self.ctrl.done==False:
-                self.ctrl.done=True
-                self.ctrl.startTime= time()
-            if self.origin == "l":  
-                u = self.ctrl.fromLeftDemands(self.target,z,dzdt)
-            elif self.origin== "r":
-                u = self.ctrl.fromRightDemands(self.target,z,dzdt)
-                print(1)
-                exit(0)
-            else: #fix this
-                u = self.ctrl.getDemands(self.target, z, dzdt)
-                print(2)
-                exit(0)
-           
+                    self.ctrl.done=True
+                    self.ctrl.startTime= time()
+            u = self.ctrl.getDemands(self.target, z, dzdt)
+        else:              
+            if self.ap=="left":
+                #print(2)
+                if self.launch.done==False:
+                    self.launch.done=True
+                    self.launch.startTime= time()
+                u= self.launch.getLeftDemands(self.target,z,dzdt)
+                print(3)
+            else: #self.direction=="right":
+                if self.launch.done==False:
+                    self.launch.done=True
+                    self.launch.startTime= time()
+                u= self.launch.getRightDemands(self.target,z,dzdt)
+                print(4)
             
-        elif self.direction=="left":
-            self.origin = "l"
-            #print(2)
-            if self.launch.done==False:
-                self.launch.done=True
-                self.launch.startTime= time()
-            u= self.launch.getLeftDemands(self.target,z,dzdt)
-            print(3)
-        else: #self.direction=="right":
-            self.origin = "r"
-            if self.launch.done==False:
-                self.launch.done=True
-                self.launch.startTime= time()
-            u= self.launch.getRightDemands(self.target,z,dzdt)
-            print(4)
-            exit(0)
         # Use mixer to convert demands U into motor values Omega
         omega = self.mixer.getMotors(u)
 

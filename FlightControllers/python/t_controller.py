@@ -16,7 +16,7 @@ class TunnelController(object):
         self.Kp = Kp
         self.windupMax = windupMax
         self.done= False
-        self.startTime = 0
+        self.startTime = float(0)
     def fromLeftDemands(self, target, alt, vel):
         # Compute dzdt setpoint and error
         velError = (0 - alt) - vel
@@ -48,7 +48,7 @@ class TunnelController(object):
         # Don't mess with roll,pitch, and yaw for this simple demo
         roll = 0
         pitch = 0
-        yaw = 0.01
+        yaw = 0.001
 
     def getDemands(self, target, alt, vel):
 
