@@ -101,7 +101,7 @@ class LaunchCopter(MulticopterServer):
         z = -state[MulticopterServer.STATE_Z]
         dzdt = -state[MulticopterServer.STATE_DZ]
 
-        if self.launch.okay or self.ap= "middle":
+        if self.launch.okay or self.ap== "middle":
             if self.ctrl.done==False:
                     self.ctrl.done=True
                     self.ctrl.startTime= time()
