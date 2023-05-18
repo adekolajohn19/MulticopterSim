@@ -26,20 +26,21 @@ class LaunchController(object):
         velError = (target - alt) - vel
 
         # Always compute throttle demand for altitude hold
-        if time() - self.startTime>23:
+        if time() - self.startTime>17:
             self.okay= True
-        throttle = self.Kp * velError if time() - self.startTime < 21.95 else 0
+        throttle = self.Kp * velError if time() - self.startTime < 15.50 else 0
 
         # Don't mess with roll,pitch, and yaw for this simple demo
         roll = 0
         pitch = 0
         yaw= -0.0001
         print(int(time()-self.startTime))
-        if time() - self.startTime < 10:
+        if time() - self.startTime < 6:
             yaw = 0.0001
-        elif time() - self.startTime > 12:
+        elif time() - self.startTime > 8:
             pitch= -.0001
             yaw= 0
+
         return throttle, roll, pitch, yaw    
     
     def getRightDemands(self, target, alt, vel):
